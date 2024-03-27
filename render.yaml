@@ -1,0 +1,71 @@
+# services:
+#   - type: web
+#     name: strapi
+#     env: node
+#     plan: starter
+#     buildCommand: yarn install && yarn build
+#     startCommand: yarn start
+#     healthCheckPath: /_health
+#     autoDeploy: false
+#     envVars:
+#       - key: NODE_VERSION
+#         value: ~16.13.0
+#       - key: NODE_ENV
+#         value: production
+#       - key: CLOUDINARY_NAME
+#         sync: false
+#       - key: CLOUDINARY_KEY
+#         sync: false
+#       - key: CLOUDINARY_SECRET
+#         sync: false
+#       - key: DATABASE_URL
+#         fromDatabase:
+#           name: strapi
+#           property: connectionString
+#       - key: JWT_SECRET
+#         generateValue: true
+#       - key: ADMIN_JWT_SECRET
+#         generateValue: true
+#       - key: APP_KEYS
+#         generateValue: true
+
+# databases:
+#   - name: strapi
+#     plan: starter
+
+services:
+  - type: web
+    name: strapi
+    env: node
+    plan: starter # Adjust plan based on your needs
+    buildCommand: yarn install && yarn build
+    startCommand: yarn start
+    healthCheckPath: /_health
+    disk:
+      name: strapi-uploads
+      mountPath: /opt/render/project/src/public/uploads
+      sizeGB: 1 # Adjust size as needed
+
+  - type: pserv # Persistent service for MySQL
+    name: mysql
+    plan: standard # Adjust plan based on your database size
+
+envVars:
+  - key: NODE_VERSION
+    value: 12.22.0 # Adjust if needed based on Strapi version
+  - key: NODE_ENV
+    value: production
+  - key: DATABASE_URL
+    fromDatabase:
+      name: mysql
+      property: connectionString
+  - key: JWT_SECRET
+    generateValue: true # Generate a strong secret key
+  - key: ADMIN_JWT_SECRET
+    generateValue: true # Generate a strong secret key
+  - key: APP_KEYS
+    generateValue: true # Generate strong encryption keys
+
+databases:
+  - name: mysql
+    plan: starter.strapi-mysql # Choose the MySQL database plan
